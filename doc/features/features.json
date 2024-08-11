@@ -913,6 +913,15 @@
     "owner": "FoundTheWOUT"
   },
   {
+    "type": "component",
+    "name": "previewTimer",
+    "displayName": "统计视频播放时长",
+    "fullRelativePath": "../../registry/dist/components/utils/timer.js",
+    "fullAbsolutePath": "registry/dist/components/utils/timer.js",
+    "description": "视频播放时，统计当前浏览视频该视频总时长",
+    "owner": "chen515024"
+  },
+  {
     "type": "plugin",
     "name": "feedsFilter.pluginBlocks.chargeFeeds",
     "displayName": "动态过滤器 - 移除充电专属动态",
