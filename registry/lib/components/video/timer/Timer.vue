@@ -26,7 +26,7 @@ export default Vue.extend({
       const h = parseInt(String((seconds / 60 / 60) % 24))
       const m = parseInt(String((seconds / 60) % 60))
       const s = parseInt(String(seconds % 60))
-      return `${h}小时${m}分钟${s}秒`
+      return `${h}:${m}:${s}`
     },
   },
   data() {
@@ -34,10 +34,11 @@ export default Vue.extend({
       timer: 0,
       videoPlaying: false,
       previewTime: 0,
+      previewList: []
     }
   },
-  computed: {
-    previewList() {
+  methods: {
+    handleInitPreviewList() {
       const storeData = JSON.parse(localStorage.getItem(PreviewTimerKeyMap.store) || '{}')
       const list: PreviewTimeItemInstance[] = []
       for (const key in storeData) {
@@ -47,9 +48,12 @@ export default Vue.extend({
         }
       }
 
-      return list
-    },
+      this.previewList = list.sort((prev, curr) => curr.createDate - prev.createDate)
+    }
   },
+  mounted() {
+    this.handleInitPreviewList()
+  }
 })
 </script>
 
@@ -57,42 +61,38 @@ export default Vue.extend({
 @import 'common';
 
 .preview-timer-container {
-  width: 300px;
-  height: 500px;
-  background: #fff;
-  border-radius: 6px;
-
   .preview-list {
-    padding: 20px 0;
+    max-height: 500px;
+    padding: 20px 10px;
     overflow-y: scroll;
-    height: 100%;
-    width: 100%;
     box-sizing: border-box;
 
     &-item {
       display: grid;
-      grid-template-columns: 50px 1fr;
-      column-gap: 20px;
-      width: 100%;
-      margin-bottom: 20px;
+      grid-template-columns: 136px 180px;
+      column-gap: 10px;
+      border-radius: 6px;
+      box-sizing: border-box;
       padding: 10px;
       .cover-img {
-        width: 50px;
-        height: 50px;
-        border-radius: 6px;
+        width: 136px;
+        height: 89px;
+        border-top-left-radius: 6px;
+        border-bottom-left-radius: 6px;
         img {
-          width: 50px;
-          height: 50px;
+          width: 136px;
+          height: 89px;
         }
       }
 
       .base-info {
         height: 100%;
+        width: 100%;
         display: flex;
         flex-direction: column;
         justify-content: space-between;
+
         &-title {
-          width: 200px;
           overflow: hidden;
           text-overflow: ellipsis;
           white-space: nowrap;
