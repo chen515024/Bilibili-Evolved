@@ -1,8 +1,8 @@
 <template>
   <div class="preview-timer-container">
     <div class="preview-list">
-      <div class="preview-list-item" v-for="item in previewList" :key="item.aid">
-        <div class='cover-img'>
+      <div v-for="item in previewList" :key="item.aid" class="preview-list-item">
+        <div class="cover-img">
           <img :src="item.coverUrl" />
         </div>
         <div class="base-info">
@@ -18,37 +18,39 @@
 </template>
 
 <script lang="ts">
-  import { videoChange } from '@/core/observer'
-  import { PreviewTimerKeyMap } from './type.d.ts'
+import { PreviewTimeItemInstance, PreviewTimerKeyMap } from './type.d'
 
-  export default Vue.extend({
-    data() {
-      return {
-        timer: 0,
-        videoPlaying: false,
-        previewTime: 0,
-      }
+export default Vue.extend({
+  filters: {
+    formatTime(seconds: number) {
+      const h = parseInt(String((seconds / 60 / 60) % 24))
+      const m = parseInt(String((seconds / 60) % 60))
+      const s = parseInt(String(seconds % 60))
+      return `${h}小时${m}分钟${s}秒`
     },
-    computed: {
-      previewList() {
-        const storeData = JSON.parse(localStorage.getItem(PreviewTimerKeyMap.store)) || {}
-        const list = []
-        for (let key in storeData) {
+  },
+  data() {
+    return {
+      timer: 0,
+      videoPlaying: false,
+      previewTime: 0,
+    }
+  },
+  computed: {
+    previewList() {
+      const storeData = JSON.parse(localStorage.getItem(PreviewTimerKeyMap.store) || '{}')
+      const list: PreviewTimeItemInstance[] = []
+      for (const key in storeData) {
+        if (Object.prototype.hasOwnProperty.call(storeData, key)) {
           const item = storeData[key]
           list.push(item)
         }
-        return list
       }
+
+      return list
     },
-    filters: {
-      formatTime(seconds: number) {
-        const h = parseInt(seconds / 60 / 60 % 24)
-        const m = parseInt(seconds / 60 % 60)
-        const s = parseInt(seconds % 60)
-        return `${h}小时${m}分钟${s}秒`
-      }
-    },
-  })
+  },
+})
 </script>
 
 <style lang="scss">
@@ -57,7 +59,7 @@
 .preview-timer-container {
   width: 300px;
   height: 500px;
-  background: #FFF;
+  background: #fff;
   border-radius: 6px;
 
   .preview-list {
@@ -110,7 +112,7 @@
 
     &-item:hover {
       cursor: pointer;
-      box-shadow:2px 2px 5px #332020;
+      box-shadow: 2px 2px 5px #332020;
     }
   }
 }
