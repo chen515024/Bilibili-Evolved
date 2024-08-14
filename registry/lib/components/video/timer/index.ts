@@ -9,19 +9,6 @@ let timer = 0
 let videoPlaying = false
 let previewTime = 0
 
-function handleVideoPlay() {
-  videoPlaying = true
-  if (timer) {
-    return
-  }
-
-  timer = window.setInterval(() => {
-    if (videoPlaying) {
-      previewTime += 1
-    }
-  }, 1000)
-}
-
 // 缓存当前视频播放时长，视频结束或者暂停时缓存
 async function handleInitStoreData(aid: string, time: number) {
   let storeData = {}
@@ -50,6 +37,21 @@ async function handleInitStoreData(aid: string, time: number) {
   localStorage.setItem(PreviewTimerKeyMap.store, JSON.stringify(storeData))
 }
 
+async function handleVideoPlay(aid: string) {
+  videoPlaying = true
+  await handleInitStoreData(aid, previewTime)
+
+  if (timer) {
+    return
+  }
+
+  timer = window.setInterval(() => {
+    if (videoPlaying) {
+      previewTime += 1
+    }
+  }, 1000)
+}
+
 const entry = () => {
   videoChange(async ({ aid }) => {
     const domKey = '.bpx-player-video-wrap video'
@@ -57,10 +59,10 @@ const entry = () => {
     const settings = JSON.parse(localStorage.getItem('bilibili_player_settings'))
     // 视频自动播放功能打开时，手动触发
     if (settings.video_status.autoplay) {
-      handleVideoPlay()
+      handleVideoPlay(aid)
     }
 
-    dq(domKey).addEventListener('play', handleVideoPlay)
+    dq(domKey).addEventListener('play', () => handleVideoPlay(aid))
 
     dq(domKey).addEventListener('pause', () => {
       videoPlaying = false

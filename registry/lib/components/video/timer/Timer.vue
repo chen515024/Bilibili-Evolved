@@ -1,118 +1,77 @@
 <template>
-  <div class="preview-timer-container">
-    <div class="preview-list">
-      <div v-for="item in previewList" :key="item.aid" class="preview-list-item">
-        <div class="cover-img">
-          <img :src="item.coverUrl" />
-        </div>
-        <div class="base-info">
-          <div class="base-info-title">{{ item.title }}</div>
-          <div class="base-info-other">
-            <span class="base-info-other-up">{{ item?.up?.name }}</span>
-            <span class="base-info-other-time">{{ item.previewTime | formatTime }}</span>
-          </div>
-        </div>
-      </div>
+  <div class="preview-time-container">
+    <div class="tab-list">
+      <div v-for="tab in componentList" :key="tab.component" :class="`tab-list-item ${tab.component === currentComponent ? 'tab-list-item--focus' : ''}`" @click="() => changeComponent(tab.component)">{{ tab.label }}</div>
     </div>
+    <component :is="currentComponent" />
   </div>
 </template>
 
 <script lang="ts">
-import { PreviewTimeItemInstance, PreviewTimerKeyMap } from './type.d'
+  import List from './list.vue'
+  import Setting from './setting.vue'
 
-export default Vue.extend({
-  filters: {
-    formatTime(seconds: number) {
-      const h = parseInt(String((seconds / 60 / 60) % 24))
-      const m = parseInt(String((seconds / 60) % 60))
-      const s = parseInt(String(seconds % 60))
-      return `${h}:${m}:${s}`
+  export default Vue.extend({
+    components: { List, Setting },
+    data() {
+      return {
+        componentList: [
+          { label: '播放记录', component: 'List' },
+          { label: '设置', component: 'Setting' },
+        ],
+        currentComponent: 'List',
+      }
     },
-  },
-  data() {
-    return {
-      timer: 0,
-      videoPlaying: false,
-      previewTime: 0,
-      previewList: []
-    }
-  },
-  methods: {
-    handleInitPreviewList() {
-      const storeData = JSON.parse(localStorage.getItem(PreviewTimerKeyMap.store) || '{}')
-      const list: PreviewTimeItemInstance[] = []
-      for (const key in storeData) {
-        if (Object.prototype.hasOwnProperty.call(storeData, key)) {
-          const item = storeData[key]
-          list.push(item)
+    methods: {
+      changeComponent(component) {
+        if (this.currentComponent !== component) {
+          this.currentComponent = component
         }
       }
-
-      this.previewList = list.sort((prev, curr) => curr.createDate - prev.createDate)
+    },
+    mounted() {
+      console.log('test preview timer')
     }
-  },
-  mounted() {
-    this.handleInitPreviewList()
-  }
-})
+  })
 </script>
 
 <style lang="scss">
 @import 'common';
-
-.preview-timer-container {
-  .preview-list {
-    max-height: 500px;
-    padding: 20px 10px;
-    overflow-y: scroll;
-    box-sizing: border-box;
+.preview-time-container {
+  display: flex;
+  flex-direction: column;
+  width: 381px;
+  .tab-list {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    justify-content: space-between;
 
     &-item {
-      display: grid;
-      grid-template-columns: 136px 180px;
-      column-gap: 10px;
-      border-radius: 6px;
-      box-sizing: border-box;
-      padding: 10px;
-      .cover-img {
-        width: 136px;
-        height: 89px;
-        border-top-left-radius: 6px;
-        border-bottom-left-radius: 6px;
-        img {
-          width: 136px;
-          height: 89px;
-        }
-      }
+      text-align: center;
+      padding: 10px 0;
+      cursor: pointer;
 
-      .base-info {
-        height: 100%;
-        width: 100%;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-
-        &-title {
-          overflow: hidden;
-          text-overflow: ellipsis;
-          white-space: nowrap;
-        }
-
-        &-other {
-          &-up {
-            text-align: left;
-          }
-
-          &-time {
-            text-align: right;
-          }
+      &--focus {
+        color: #F00;
+        position: relative;
+        &::after {
+          content: "";
+          position: absolute;
+          width: 20px;
+          height: 3px;
+          bottom: 0;
+          left: 50%;
+          transform: translate(-50%);
+          background: #F00;
         }
       }
     }
 
     &-item:hover {
-      cursor: pointer;
-      box-shadow: 2px 2px 5px #332020;
+      color: #F00;
+      opacity: 0.85;
     }
   }
 }
